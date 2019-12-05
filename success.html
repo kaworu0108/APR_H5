@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>授权结果页</title>
+  <style>
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      background-color: #f0f0f0;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .imgrwd {
+      max-width: 100%;
+    }
+
+    #img__zone {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .dialog {
+      width: 90%;
+      background-color: #ffffff;
+      position: relative;
+      top: -18px;
+      z-index: -999;
+    }
+
+    @media screen and (max-width:2680px) and (min-width:850px) {
+      .dialog {
+        width: 50%;
+      }
+    }
+
+    #dialogTitle {
+      font-size: 1rem;
+      line-height: 25px;
+      color: #000000;
+      text-align: center;
+      margin: 33px 0 20px 0;
+    }
+
+    .line {
+      width: 100%;
+      height: 1px;
+      opacity: 0.05;
+      border-radius: 63px;
+      background-color: #000000;
+    }
+
+    #dialogContent {
+      width: 90%;
+      height: 80px;
+      margin: 14px auto;
+      position: relative;
+      background: rgb(0, 0, 0, 0.05);
+    }
+
+    .detilRight {
+      float: right;
+      width: 90%;
+      margin: 14px auto;
+    }
+
+    .detilLeft {
+      float: left;
+      width: 10%;
+      text-align: center;
+      margin: 14px auto;
+    }
+
+    #loading {
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* loading css */
+    .ant-spin {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      color: rgba(0, 0, 0, 0.65);
+      font-size: 14px;
+      font-variant: tabular-nums;
+      line-height: 1.5;
+      list-style: none;
+      font-feature-settings: "tnum";
+      position: absolute;
+      display: none;
+      color: #1890ff;
+      text-align: center;
+      vertical-align: middle;
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
+    }
+
+    .ant-spin-spinning {
+      position: static;
+      display: inline-block;
+      opacity: 1;
+    }
+
+    .ant-spin-nested-loading {
+      position: relative;
+    }
+
+    .ant-spin-nested-loading>div>.ant-spin {
+      position: absolute;
+      z-index: 4;
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-height: 400px;
+    }
+
+    .ant-spin-nested-loading>div>.ant-spin .ant-spin-dot {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: -10px;
+    }
+
+    .ant-spin-nested-loading>div>.ant-spin .ant-spin-text {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      padding-top: 5px;
+      text-shadow: 0 1px 2px #fff;
+    }
+
+    .ant-spin-nested-loading>div>.ant-spin.ant-spin-show-text .ant-spin-dot {
+      margin-top: -20px;
+    }
+
+    .ant-spin-nested-loading>div>.ant-spin-sm .ant-spin-dot {
+      margin: -7px;
+    }
+
+    .ant-spin-nested-loading>div>.ant-spin-sm .ant-spin-text {
+      padding-top: 2px;
+    }
+
+    .ant-spin-nested-loading>div>.ant-spin-sm.ant-spin-show-text .ant-spin-dot {
+      margin-top: -17px;
+    }
+
+    .ant-spin-nested-loading>div>.ant-spin-lg .ant-spin-dot {
+      margin: -16px;
+    }
+
+    .ant-spin-nested-loading>div>.ant-spin-lg .ant-spin-text {
+      padding-top: 11px;
+    }
+
+    .ant-spin-nested-loading>div>.ant-spin-lg.ant-spin-show-text .ant-spin-dot {
+      margin-top: -26px;
+    }
+
+    .ant-spin-container {
+      position: relative;
+      transition: opacity 0.3s;
+    }
+
+    .ant-spin-container::after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 10;
+      display: none \9;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      content: "";
+    }
+
+    .ant-spin-blur {
+      clear: both;
+      overflow: hidden;
+      opacity: 0.5;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .ant-spin-blur::after {
+      opacity: 0.4;
+      pointer-events: auto;
+    }
+
+    .ant-spin-tip {
+      color: rgba(0, 0, 0, 0.45);
+    }
+
+    .ant-spin-dot {
+      position: relative;
+      display: inline-block;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .ant-spin-dot i {
+      position: absolute;
+      display: block;
+      width: 9px;
+      height: 9px;
+      background-color: #1890ff;
+      border-radius: 100%;
+      transform: scale(0.75);
+      transform-origin: 50% 50%;
+      opacity: 0.3;
+      -webkit-animation: antSpinMove 1s infinite linear alternate;
+      animation: antSpinMove 1s infinite linear alternate;
+    }
+
+    .ant-spin-dot i:nth-child(1) {
+      top: 0;
+      left: 0;
+    }
+
+    .ant-spin-dot i:nth-child(2) {
+      top: 0;
+      right: 0;
+      -webkit-animation-delay: 0.4s;
+      animation-delay: 0.4s;
+    }
+
+    .ant-spin-dot i:nth-child(3) {
+      right: 0;
+      bottom: 0;
+      -webkit-animation-delay: 0.8s;
+      animation-delay: 0.8s;
+    }
+
+    .ant-spin-dot i:nth-child(4) {
+      bottom: 0;
+      left: 0;
+      -webkit-animation-delay: 1.2s;
+      animation-delay: 1.2s;
+    }
+
+    .ant-spin-dot-spin {
+      transform: rotate(45deg);
+      -webkit-animation: antRotate 1.2s infinite linear;
+      animation: antRotate 1.2s infinite linear;
+    }
+
+    .ant-spin-sm .ant-spin-dot {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+
+    .ant-spin-sm .ant-spin-dot i {
+      width: 6px;
+      height: 6px;
+    }
+
+    .ant-spin-lg .ant-spin-dot {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+
+    .ant-spin-lg .ant-spin-dot i {
+      width: 14px;
+      height: 14px;
+    }
+
+    .ant-spin.ant-spin-show-text .ant-spin-text {
+      display: block;
+    }
+
+    @media all and (-ms-high-contrast: none),
+    (-ms-high-contrast: active) {
+
+      /* IE10+ */
+      .ant-spin-blur {
+        background: #fff;
+        opacity: 0.5;
+      }
+    }
+
+    @-webkit-keyframes antSpinMove {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes antSpinMove {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @-webkit-keyframes antRotate {
+      to {
+        transform: rotate(405deg);
+      }
+    }
+
+    @keyframes antRotate {
+      to {
+        transform: rotate(405deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="success__zone">
+    <div id="img__zone">
+      <img alt="授权成功" class="imgrwd"
+        src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KCiA8Zz4KICA8dGl0bGU+YmFja2dyb3VuZDwvdGl0bGU+CiAgPHJlY3QgZmlsbD0ibm9uZSIgaWQ9ImNhbnZhc19iYWNrZ3JvdW5kIiBoZWlnaHQ9IjEyMiIgd2lkdGg9IjE0MiIgeT0iLTEiIHg9Ii0xIi8+CiA8L2c+CiA8Zz4KICA8dGl0bGU+TGF5ZXIgMTwvdGl0bGU+CiAgPHBhdGggaWQ9InN2Z18yIiBkPSJtODEuNjc5LDkxLjExN2w5LjkwOCwwYzI1LjA4LDAgNDUuNDEzLC0yMC4zOTcgNDUuNDEzLC00NS41NThjMCwtMjUuMTY3IC0yMC4zMzIsLTQ1LjU1OSAtNDUuNDEzLC00NS41NTlsLTQzLjE3NCwwYy0yNS4wOCwwIC00NS40MTMsMjAuMzk3IC00NS40MTMsNDUuNTU5YzAsMjUuMTY2IDIwLjMzMiw0NS41NTggNDUuNDEzLDQ1LjU1OGw5LjkwOCwwbDYuODYyLDYuODgzYTYuNzk5LDYuNzk5IDAgMCAwIDkuNjM0LDBsNi44NjIsLTYuODgybDAsLTAuMDAxeiIgZmlsbD0iIzgwQ0MzMSIvPgogIDx0ZXh0IHg9Ii0wLjE5ODE2OSIgeT0iLTI0LjIwOTYxMyIgaWQ9InN2Z18zIiBmb250LXdlaWdodD0iNTAwIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0iUGluZ0ZhbmdUQy1TZW1pYm9sZCwgUGluZ0ZhbmcgVEMiIGZpbGw9IiNGRkYiPgogICA8dHNwYW4gaWQ9InN2Z180IiB5PSI1My4wMDE3MTQiIHg9IjMwLjYwMTM3MyI+5o6I5p2D5oiQ5YqfPC90c3Bhbj4KICA8L3RleHQ+CiA8L2c+Cjwvc3ZnPg==" />
+      <img alt="授权成功" class="imgrwd"
+        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMjU0IiBoZWlnaHQ9IjE0NyIgdmlld0JveD0iMCAwIDI1NCAxNDciPgogICAgPGRlZnM+CiAgICAgICAgPHBhdGggaWQ9ImEiIGQ9Ik0wIDBoMjU0djEyOUgweiIvPgogICAgPC9kZWZzPgogICAgPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8cGF0aCBkPSJNMCAwaDI1NHYxNDdIMHoiLz4KICAgICAgICA8cGF0aCBkPSJNMCAwaDI1NHYxNDdIMHoiLz4KICAgICAgICA8Zz4KICAgICAgICAgICAgPG1hc2sgaWQ9ImIiIGZpbGw9IiNmZmYiPgogICAgICAgICAgICAgICAgPHVzZSB4bGluazpocmVmPSIjYSIvPgogICAgICAgICAgICA8L21hc2s+CiAgICAgICAgICAgIDxnIG1hc2s9InVybCgjYikiPgogICAgICAgICAgICAgICAgPHBhdGggZmlsbD0iI0Q4RDhEOCIgZD0iTTIxMy42NjggNDYuMTQyYy44LTIuNDM0IDUuNDE0LTQuMjcyIDguNjAzLTUuNDMgMjYuODQtOS43NDYgMzEuNDMzIDcuNjEgMjcuMDIgMTQuMjE1LTQuNDEyIDYuNjA2LTE3LjEyIDEzLjE0LTM1LjAyLTEuMjMzLTIuMjE2LTEuNzc5LTEuMTQ5LTUuODktLjYwMy03LjU1MnoiLz4KICAgICAgICAgICAgICAgIDxwYXRoIGZpbGw9IiNEOEQ4RDgiIGQ9Ik0xMzcuMTkyIDIxMC42MDZjOTkuNDU0IDAgMTIyLjg0OC01Mi4wMjIgMTExLjE1LTExMS4yMjZDMjM2LjY0NyA0MC4xNzcgMTg5Ljg2MiAwIDEyOC41OTYgMFMxOC42NDUgNDIuMjMzIDEwLjg2NyAxMDUuMzAzYy03Ljc3NyA2My4wNyAyNi44NyAxMDUuMzAzIDEyNi4zMjUgMTA1LjMwM3oiLz4KICAgICAgICAgICAgICAgIDxwYXRoIGZpbGw9IiNEOEQ4RDgiIGQ9Ik0zOS4zNTMgNTIuNTMxYy0uOC0yLjQzNC01LjQxNC00LjI3Mi04LjYwMy01LjQzQzMuOTEgMzcuMzU1LS42ODMgNTQuNzEgMy43MyA2MS4zMTZjNC40MTIgNi42MDYgMTcuMTIgMTMuMTQgMzUuMDItMS4yMzMgMi4yMTYtMS43NzkgMS4xNDktNS44OS42MDMtNy41NTJ6Ii8+CiAgICAgICAgICAgICAgICA8cGF0aCBmaWxsPSIjRkZGIiBkPSJNMTExLjg1MiAxNDEuMTk2YzMuMDk1IDIwLjUyNyA1LjcwMSAzMi4wMyA3LjgyIDM0LjUwOCAyLjExNyAyLjQ3OCA2LjUzOSAzLjkxNCAxMy4yNjUgNC4zMWwxLjgxNC0xNC45MDMgMS42NjUgMTQuOTAyYzcuODQtMS44NTggMTIuNTUtNC4yMjcgMTQuMTMtNy4xMDggMS41ODItMi44OCAzLjA5OS0xMy40NSA0LjU1My0zMS43MDlsLTIxLjYyNC02Ljc2LTIxLjYyMyA2Ljc2eiIvPgogICAgICAgICAgICAgICAgPGcgc3Ryb2tlPSIjOTk5IiBzdHJva2Utd2lkdGg9IjEuNiI+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTg5Ljg5MiA4MC4wMTdsLTE5LjIyLTkuNTgzTTg5Ljg5MiA4MS42MTRsLTE5LjIyLTkuNTgzIi8+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICA8ZyBzdHJva2U9IiM5OTkiIHN0cm9rZS13aWR0aD0iMS42Ij4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMTY5Ljk3OSA4MC4wMTdsMTkuMjItOS41ODNNMTY5Ljk3OSA4MS42MTRsMTkuMjItOS41ODMiLz4KICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgIDxwYXRoIGZpbGw9IiNERENBQ0EiIGQ9Ik0xOTYuNDA3IDEwOC45MWMxMS42NjQtLjkwMiAxNi44MTgtNS41OTEgMTYuODE4LTEwLjg4NHMtNC40Ni05LjIzOC0xNi44MTgtOC4yODNjLTEyLjM1Ny45NTYtMTYuODE4IDUuNTkyLTE2LjgxOCAxMC44ODUgMCA1LjI5MiA1LjE1NSA5LjE4NCAxNi44MTggOC4yODJ6TTczLjA3NCAxMDcuMzEzYy0xMS42NjQtLjkwMi0xNi44MTgtNS41OTItMTYuODE4LTEwLjg4NCAwLTUuMjkzIDQuNDYtOS4yMzkgMTYuODE4LTguMjgzIDEyLjM1Ny45NTYgMTYuODE4IDUuNTkyIDE2LjgxOCAxMC44ODQgMCA1LjI5My01LjE1NCA5LjE4NS0xNi44MTggOC4yODN6Ii8+CiAgICAgICAgICAgICAgICA8cGF0aCBmaWxsPSIjRjJGMkYyIiBkPSJNMTMzLjQ3NSAxMzQuNDM2bDIxLjYyNCA2Ljc2YTU1NC44MiA1NTQuODIgMCAwIDEtLjk4NyAxMS4xMWMtNS41NTItLjI1Mi0xMS4zNC0yLjEzNC0xNy4zNjMtNS42NDUtNy4wOTYgNS4wMDgtMTQuODY0IDYuNTI1LTIzLjMwNiA0LjU1YTU5MC42NTMgNTkwLjY1MyAwIDAgMS0xLjU5MS0xMC4wMTVsMjEuNjIzLTYuNzZ6Ii8+CiAgICAgICAgICAgICAgICA8cGF0aCBmaWxsPSIjQjdCN0I3IiBkPSJNMTMzLjU0NiAxNDAuNDI4YzEwLjMwNCA2LjAwNiAxOS45MTggNy4yNDMgMjguODQyIDMuNzEyIDEzLjM4Ni01LjI5OCAxOC45ODUtMTQuNjM3IDE2LjAyNS0yNC45NjYtNC41MDMtMTUuNzE1LTIyLjUxNy0yNi4zOC00Ni4xMDUtMjYuMzgtMjMuNTkgMC00Mi4zMzQgMTEuMjEtNDUuMzI4IDI3Ljk1Mi0xLjkzMiAxMC44MDQgNS44NTMgMTguNzEzIDIwLjI2NCAyMy4zOTQgOS42MDcgMy4xMiAxOC4zNzQgMS44ODMgMjYuMzAyLTMuNzEyeiIvPgogICAgICAgICAgICAgICAgPHBhdGggZmlsbD0iIzk5OSIgZD0iTTEzMy4xMzkgMTIxLjgyYzExLjUgMCAyMC44MjItOS4zMzEgMjAuODIyLTIwLjg0MiAwLTExLjUxMi05LjMyMi0xNC4yOTYtMjAuODIyLTE0LjI5NnMtMjAuODIzIDIuNzg0LTIwLjgyMyAxNC4yOTZjMCAxMS41MSA5LjMyMyAyMC44NDMgMjAuODIzIDIwLjg0M3oiLz4KICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8cGF0aCBmaWxsPSIjQjdCN0I3IiBkPSJNMTMzLjU0NiAxNDAuNDI4YzEwLjMwNCA2LjAwNiAxOS45MTggNy4yNDMgMjguODQyIDMuNzEyIDEzLjM4Ni01LjI5OCAxOC45ODUtMTQuNjM3IDE2LjAyNS0yNC45NjYtNC41MDMtMTUuNzE1LTIyLjUxNy0yNi4zOC00Ni4xMDUtMjYuMzgtMjMuNTkgMC00Mi4zMzQgMTEuMjEtNDUuMzI4IDI3Ljk1Mi0xLjkzMiAxMC44MDQgNS44NTMgMTguNzEzIDIwLjI2NCAyMy4zOTQgOS42MDcgMy4xMiAxOC4zNzQgMS44ODMgMjYuMzAyLTMuNzEyeiIgbWFzaz0idXJsKCNiKSIvPgogICAgICAgICAgICA8cGF0aCBmaWxsPSIjOTk5IiBkPSJNMTMzLjEzOSAxMjEuODJjMTEuNSAwIDIwLjgyMi05LjMzMSAyMC44MjItMjAuODQyIDAtMTEuNTEyLTkuMzIyLTE0LjI5Ni0yMC44MjItMTQuMjk2cy0yMC44MjMgMi43ODQtMjAuODIzIDE0LjI5NmMwIDExLjUxIDkuMzIzIDIwLjg0MyAyMC44MjMgMjAuODQzeiIgbWFzaz0idXJsKCNiKSIvPgogICAgICAgIDwvZz4KICAgICAgICA8cGF0aCBmaWxsPSIjQjdCN0I3IiBkPSJNMTMzLjU0NiAxNDAuNDI4YzEwLjMwNCA2LjAwNiAxOS45MTggNy4yNDMgMjguODQyIDMuNzEyIDEzLjM4Ni01LjI5OCAxOC45ODUtMTQuNjM3IDE2LjAyNS0yNC45NjYtNC41MDMtMTUuNzE1LTIyLjUxNy0yNi4zOC00Ni4xMDUtMjYuMzgtMjMuNTkgMC00Mi4zMzQgMTEuMjEtNDUuMzI4IDI3Ljk1Mi0xLjkzMiAxMC44MDQgNS44NTMgMTguNzEzIDIwLjI2NCAyMy4zOTQgOS42MDcgMy4xMiAxOC4zNzQgMS44ODMgMjYuMzAyLTMuNzEyeiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiM5OTkiIGQ9Ik0xMzMuMTM5IDEyMS44MmMxMS41IDAgMjAuODIyLTkuMzMxIDIwLjgyMi0yMC44NDIgMC0xMS41MTItOS4zMjItMTQuMjk2LTIwLjgyMi0xNC4yOTZzLTIwLjgyMyAyLjc4NC0yMC44MjMgMTQuMjk2YzAgMTEuNTEgOS4zMjMgMjAuODQzIDIwLjgyMyAyMC44NDN6Ii8+CiAgICA8L2c+Cjwvc3ZnPgo=" />
+    </div>
+  </div>
+  <div class="dialog">
+    <p id="dialogTitle"></p>
+    <hr class="line">
+    <div id="dialogContent">
+      <div class="dialogContentDetil">
+        <!--授權進行中-->
+        <div id="loading" class="ant-spin ant-spin-spinning" data-v-21b4b419="">
+          <span class="ant-spin-dot ant-spin-dot-spin">
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+          </span>
+        </div>
+        <!-- 授權結束 -->
+        <div id="dialogSucess">
+          <div class="detilLeft"><img alt=""
+              src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMjBweCIgaGVpZ2h0PSIyMHB4IiB2aWV3Qm94PSIwIDAgMjAgMjAiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogc2tldGNodG9vbCA1OS4xICgxMDEwMTApIC0gaHR0cHM6Ly9za2V0Y2guY29tIC0tPgogICAgPHRpdGxlPjVBMzkyQTNELTVCMkUtNEE2Ri04RTFELTBCMDJBQjFBRUFENTwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggc2tldGNodG9vbC48L2Rlc2M+CiAgICA8ZyBpZD0iQXNzZXRzIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0iQXNzZXRzX2ZvcldlYiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTUwLjAwMDAwMCwgLTk5Ny4wMDAwMDApIiBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9Im5vbnplcm8iPgogICAgICAgICAgICA8ZyBpZD0iaWNvX2F0dGVudGlvbiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNTAuMDAwMDAwLCA5OTcuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICA8cmVjdCBvcGFjaXR5PSIwIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMjAiPjwvcmVjdD4KICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0xMCwxLjg3NSBDNS41MiwxLjg3NSAxLjg3NSw1LjUyIDEuODc1LDEwIEMxLjg3NSwxNC40OCA1LjUyLDE4LjEyNSAxMCwxOC4xMjUgQzE0LjQ4LDE4LjEyNSAxOC4xMjUsMTQuNDggMTguMTI1LDEwIEMxOC4xMjUsNS41MiAxNC40OCwxLjg3NSAxMCwxLjg3NSBaIE0xMCwzLjEyNSBDMTMuODA0Mzc1LDMuMTI1IDE2Ljg3NSw2LjE5NTYyNSAxNi44NzUsMTAgQzE2Ljg3NSwxMy44MDQzNzUgMTMuODA0Mzc1LDE2Ljg3NSAxMCwxNi44NzUgQzYuMTk1NjI1LDE2Ljg3NSAzLjEyNSwxMy44MDQzNzUgMy4xMjUsMTAgQzMuMTI1LDYuMTk1NjI1IDYuMTk1NjI1LDMuMTI1IDEwLDMuMTI1IFogTTkuMzc1LDYuMjUgTDkuMzc1LDExLjI1IEwxMC42MjUsMTEuMjUgTDEwLjYyNSw2LjI1IEw5LjM3NSw2LjI1IFogTTkuMzc1LDEyLjUgTDkuMzc1LDEzLjc1IEwxMC42MjUsMTMuNzUgTDEwLjYyNSwxMi41IEw5LjM3NSwxMi41IFoiIGlkPSJTaGFwZSI+PC9wYXRoPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4="
+              style="vertical-align:middle" /></div>
+          <div class="detilRight">
+            <span class="dialogText">若其中有授权失败，可以回到<span style="font-weight: 600;">[河狸App]</span> 再次进行授权流程</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+  </div>
+
+
+</body>
+<script>
+  document.body.addEventListener('touchmove', function (e) {
+    e.preventDefault(); //阻止默認的處理方式(阻止下拉滑動的效果)
+  }, { passive: false }); //passive 參數不能省略，用來相容ios和android
+
+
+  //取網址參數
+  var obj = {};
+  var result = window.location.search;
+  var resultUrl = result.substr(result.indexOf("?") + 1);
+  var re = /([^=&]+)=([^&]*)/g;
+  var mUrl;
+
+  while ((mUrl = re.exec(resultUrl))) {
+    // console.log(mUrl);
+    // console.log("1", mUrl[1]);
+    // console.log("2", mUrl[2]);
+
+    obj[mUrl[1]] = mUrl[2];
+    console.log(obj[mUrl[1]], "abc");
+    console.log(mUrl[2]);
+  }
+
+  // var searchParams = new URLSearchParams(resultUrl);
+  // // console.log(searchParams);
+  // for (let p of searchParams) {
+  //   var result = p;
+  //   obj[result] = result[2];
+  //   console.log(obj[result]);
+  //   console.log(result);
+  // }
+
+  var dialogTitle = document.getElementById('dialogTitle');
+  var loading = document.getElementById('loading');
+  var dialogSucess = document.getElementById('dialogSucess');
+  var status = Object.keys(obj).length !== 0 && !!obj.redirect_uri && !!obj.delay;
+
+  function checkUrl() {
+    if (status === "true") {
+      // console.log("cccc-1", obj.redirect_uri)
+      dialogTitle.innerText = "还有其他要授权的项目喔，请稍后…";
+      dialogSucess.style.display = "none";
+      var time = obj.delay * 1000;
+      var decodeUrl = decodeURIComponent(obj.redirect_uri);
+      // console.log(decodeUrl);
+      window.setTimeout(function () {
+        // console.log("sss", obj.redirect_uri)
+        window.location = decodeUrl;
+      }, time)
+    }
+    else {
+      // console.log("cccc-2")
+      dialogTitle.innerText = "所有授权步骤已结束，河狸感谢你";
+      loading.style.display = "none";
+    }
+  }
+  checkUrl();
+
+
+</script>
+
+</html>
